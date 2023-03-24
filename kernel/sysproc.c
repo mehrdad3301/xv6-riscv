@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -98,4 +99,23 @@ sys_proctick(void)
   int pid;
   argint(0, &pid);
   return proctick(pid);
+}
+
+uint64 
+sys_sysinfo(void) 
+{ 
+  struct sysinfo sinfo; 
+  struct proc *p = myproc() ; 
+  uint64 pinfo; 
+
+  argaddr(0, &pinfo); 
+  
+  sinfo.uptime = sys_uptime() / 10 ; 
+  sinfo.freeram = freemem(); 
+  sinfo.procs = nprocs(); 
+
+  if (copyout(p->pagetable, pinfo, (char *)&sinfo, sizeof(sinfo)) < 0)
+    return -1;
+
+  return 0; 
 }
