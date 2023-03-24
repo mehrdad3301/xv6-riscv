@@ -124,6 +124,11 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  
+  acquire(&tickslock);
+  p->ticks0 = ticks;
+  release(&tickslock);
+  
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -168,6 +173,7 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
+  p->ticks0 = 0; 
   p->state = UNUSED;
 }
 
@@ -680,4 +686,31 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+int 
+proctick(int pid) 
+{ 
+
+  struct proc *p;
+  uint ticks0, xticks ; 
+
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+    if(p->pid == pid){
+      ticks0 = p->ticks0; 
+      release(&p->lock);
+      goto found ; 
+      break; 
+    }
+    release(&p->lock);
+    return -1; 
+  }
+
+found: 
+
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+  return xticks - ticks0;
 }

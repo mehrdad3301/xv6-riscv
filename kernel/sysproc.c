@@ -89,3 +89,13 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// return how many clock tick interrupts have passed 
+// since this process started.  
+uint64 
+sys_proctick(void) 
+{ 
+  int pid;
+  argint(0, &pid);
+  return proctick(pid);
+}
