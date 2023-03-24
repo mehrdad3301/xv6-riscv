@@ -87,7 +87,7 @@ uint64
 freemem(void)
 { 
   struct run *r; 
-  uint64 free ; 
+  uint64 free = 0; 
 
   acquire(&kmem.lock); 
   r = kmem.freelist;
