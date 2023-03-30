@@ -69,7 +69,9 @@ usertrap(void)
     // ok
   } else if ((r_scause() == 13) || (r_scause() == 15)) {
     //page fault 
-    lazyalloc(p->pagetable, r_stval()); 
+    if(lazyalloc(p, r_stval()) < 0) { 
+      setkilled(p);
+    }
   } else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());

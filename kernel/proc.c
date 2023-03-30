@@ -280,6 +280,25 @@ growproc(int n)
   return 0;
 }
 
+// Lazy allocation of memory for process p 
+// at virtual address given by va.
+uint64 
+lazyalloc(struct proc *p, uint64 va) { 
+
+  va = PGROUNDDOWN(va); 
+
+  if ((va >= p->sz) || (va < PGROUNDUP(p->trapframe->sp))) 
+    return -1 ; 
+
+  char *mem = kalloc(); 
+  if (mappages(p->pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_X|PTE_U) != 0){ 
+    kfree(mem); 
+    return -1; 
+  }
+
+  return 0; 
+}
+
 // Create a new process, copying the parent.
 // Sets up child kernel stack to return as if from fork() system call.
 int

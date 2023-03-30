@@ -345,20 +345,6 @@ uvmclear(pagetable_t pagetable, uint64 va)
   *pte &= ~PTE_U;
 }
 
-uint64 
-lazyalloc(pagetable_t pagetable, uint64 va) { 
-
-  va = PGROUNDDOWN(va); 
-
-  char *mem = kalloc(); 
-  if (mappages(pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_X|PTE_U) != 0){ 
-    kfree(mem); 
-    return -1; 
-  }
-
-  return 0; 
-}
-
 // Copy from kernel to user.
 // Copy len bytes from src to virtual address dstva in a given page table.
 // Return 0 on success, -1 on error.
