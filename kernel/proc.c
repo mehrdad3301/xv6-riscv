@@ -291,12 +291,15 @@ lazyalloc(struct proc *p, uint64 va) {
     return -1 ; 
 
   char *mem = kalloc(); 
+  if (mem == 0) 
+    return -1; 
+
   if (mappages(p->pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_X|PTE_U) != 0){ 
     kfree(mem); 
     return -1; 
   }
 
-  return 0; 
+  return (uint64)mem; 
 }
 
 // Create a new process, copying the parent.
