@@ -78,7 +78,6 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2) { 
-    update_pticks(); 
     yield();
   }
 
@@ -169,6 +168,7 @@ clockintr()
   ticks++;
   wakeup(&ticks);
   release(&tickslock);
+  update_pticks() ; 
 }
 
 // check if it's an external interrupt or software interrupt,
