@@ -3,6 +3,8 @@
 #include "kernel/sysinfo.h"
 #include "user/user.h"
 
+#define M 1000000
+
 int 
 main(int argc, char *argv[])
 { 
@@ -18,8 +20,8 @@ main(int argc, char *argv[])
         exit(-1); 
     }
 
-    printf("uptime: %d\ntotal memory: %d\nfree memory: %d\nused processes: %d\n",
-    sinfo.uptime, sinfo.totalram, sinfo.freeram, sinfo.procs); 
+    printf("uptime: %d\ntotal memory: %dM\nfree memory: %dM\nused processes: %d\n",
+    sinfo.uptime, sinfo.totalram, sinfo.freeram/M , sinfo.procs); 
 
     exit(0); 
 }

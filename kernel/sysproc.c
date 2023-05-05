@@ -112,6 +112,7 @@ sys_sysinfo(void)
   
   sinfo.uptime = sys_uptime() / 10 ; 
   sinfo.freeram = freemem(); 
+  sinfo.totalram = 4096; 
   sinfo.procs = nprocs(); 
 
   if (copyout(p->pagetable, pinfo, (char *)&sinfo, sizeof(sinfo)) < 0)
