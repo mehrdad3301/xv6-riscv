@@ -119,3 +119,14 @@ sys_sysinfo(void)
 
   return 0; 
 }
+
+uint64 
+sys_sched(void)
+{ 
+  char buf[MAXARG] ; 
+  if (argstr(0, buf, MAXARG) < 0 ) { 
+    return -1 ; 
+  }
+  switch_scheduler(buf); 
+  return 0 ; 
+}

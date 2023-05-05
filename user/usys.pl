@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("proctick");
 entry("sysinfo");
+entry("sched"); 

@@ -22,4 +22,6 @@
 #define SYS_close  21
 #define SYS_proctick 22
 #define SYS_sysinfo 23
+#define SYS_sched   24
+
 
