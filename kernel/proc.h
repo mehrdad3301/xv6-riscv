@@ -105,7 +105,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   uint ctime;                  // ticks when process was created
-  uint ttime;                  // ticks when process was terminated 
+  uint utime;                  // ticks since ctime  
   // Number of ticks for which this process
   uint rtime;                  // was in RUNNING state
   // Number of ticks for which this process
