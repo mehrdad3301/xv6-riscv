@@ -8,6 +8,8 @@
 
 struct cpu cpus[NCPU];
 
+enum { FCFS, RR} scheduler_type ; 
+
 struct proc proc[NPROC];
 
 struct proc *initproc;
@@ -450,29 +452,85 @@ wait(uint64 addr)
 void
 scheduler(void)
 {
+
   struct proc *p;
   struct cpu *c = mycpu();
   
   c->proc = 0;
+  
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+    if (scheduler_type == RR) {
+      for(p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if(p->state == RUNNABLE) {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+        release(&p->lock);
+
+        // Breaking out of loop if algorithm is changed via system call
+        if (scheduler_type != RR) 
+          break ;
       }
-      release(&p->lock);
+    } 
+    else if (scheduler_type == FCFS) { 
+      struct proc *firstP = 0 ;  
+
+      for (p = proc; p < &proc[NPROC]; p++) { 
+        acquire(&p->lock) ; 
+        if (p->state == RUNNABLE) {
+          // Avoid scheduling init or sh processes 
+          if (p->pid > 2) { 
+            if (firstP != 0) { 
+              if (p->ticks0 < firstP->ticks0) { 
+                firstP = p ; 
+              }
+            } else { 
+              firstP = p ; 
+            }
+          }
+        }
+        release(&p->lock) ; 
+      }
+
+      if (firstP != 0) {
+          acquire(&firstP->lock) ;
+          p = firstP ; 
+          // Avoiding race 
+          if (p->state == RUNNABLE) {
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
+          c->proc = 0;
+          }
+          release(&firstP->lock) ;
+      } else { 
+        // scheduling init or sh processes if 
+        // no other process is RUNNING 
+        for(p = proc; p < &proc[NPROC]; p++) {
+          acquire(&p->lock);
+          if(p->pid == 1 || p->pid == 2) {
+            if(p->state == RUNNABLE) {
+              p->state = RUNNING;
+              c->proc = p;
+              swtch(&c->context, &p->context);
+              c->proc = 0;
+            }
+          }
+          release(&p->lock);
+        }
+      }
     }
   }
 }
@@ -521,7 +579,6 @@ void
 forkret(void)
 {
   static int first = 1;
-
   // Still holding p->lock from scheduler.
   release(&myproc()->lock);
 
