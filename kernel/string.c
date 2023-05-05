@@ -105,3 +105,64 @@ strlen(const char *s)
   return n;
 }
 
+char*
+strnindent(char *s, char *w, int indent) 
+{ 
+  int i ; 
+  for (i = 0 ; s[i] ; i++) {
+    w[i] = s[i] ;
+  }
+  for(; i < indent ; i++) { 
+    w[i] = *(char *) " " ; 
+  }
+  w[i] = '\0' ; 
+  return w ;
+}
+
+char *
+strnreverse(char *s, int len)
+{
+  int start = 0;
+  int end = len - 1;
+  while (start < end) {
+      char temp = s[start];
+      s[start] = s[end];
+      s[end] = temp;
+      end--;
+      start++;
+  }
+  return s ; 
+}
+
+char* 
+stritoa(int num, char *s, int base)
+{
+
+    int i = 0;
+    int isNegative = 0; 
+ 
+    if (num == 0){
+        s[i++] = '0';
+        s[i] = '\0';
+        return s;
+    }
+ 
+    if (num < 0 && base == 10){
+        isNegative = 1;
+        num = -num;
+    }
+
+    while (num != 0)
+    {
+        int rem = num % base;
+        s[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
+        num = num/base;
+    }
+ 
+    if (isNegative)
+        s[i++] = '-';
+ 
+    s[i] = '\0'; 
+    return strnreverse(s, i);
+}
+

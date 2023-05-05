@@ -101,7 +101,6 @@ void            procinit(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
-void            switch_scheduler(char *); 
 void            userinit(void);
 int             wait(uint64);
 void            wakeup(void*);
@@ -111,6 +110,8 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 int             proctick(int);
 int             nprocs(void);
+void            switch_scheduler(char *); 
+void            update_pticks(void); 
 
 // swtch.S
 void            swtch(struct context*, struct context*);
@@ -137,6 +138,9 @@ char*           safestrcpy(char*, const char*, int);
 int             strlen(const char*);
 int             strncmp(const char*, const char*, uint);
 char*           strncpy(char*, const char*, int);
+char*           strnindent(char*, char*, int); 
+char*           stritoa(int, char*, int);
+char*           strnreverse(char*, int);
 
 // syscall.c
 void            argint(int, int*);
