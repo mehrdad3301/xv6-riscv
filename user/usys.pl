@@ -39,3 +39,7 @@ entry("uptime");
 entry("proctick");
 entry("sysinfo");
 entry("sched"); 
+entry("utime"); 
+entry("wtime"); 
+entry("btime"); 
+

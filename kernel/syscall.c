@@ -104,6 +104,9 @@ extern uint64 sys_close(void);
 extern uint64 sys_proctick(void);
 extern uint64 sys_sysinfo(void);
 extern uint64 sys_sched(void);
+extern uint64 sys_wtime(void);
+extern uint64 sys_utime(void);
+extern uint64 sys_btime(void);
 
 
 // An array mapping syscall numbers from syscall.h
@@ -133,6 +136,9 @@ static uint64 (*syscalls[])(void) = {
 [SYS_proctick] sys_proctick,
 [SYS_sysinfo] sys_sysinfo,
 [SYS_sched]   sys_sched,
+[SYS_wtime]   sys_wtime,
+[SYS_utime]   sys_utime,
+[SYS_btime]   sys_btime,
 };
 
 void

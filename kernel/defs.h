@@ -112,6 +112,9 @@ int             proctick(int);
 int             nprocs(void);
 void            switch_scheduler(char *); 
 void            update_pticks(void); 
+int             get_wtime(int) ; 
+int             get_utime(int) ; 
+int             get_btime(int) ; 
 
 // swtch.S
 void            swtch(struct context*, struct context*);

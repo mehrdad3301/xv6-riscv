@@ -131,3 +131,31 @@ sys_sched(void)
   switch_scheduler(buf); 
   return 0 ; 
 }
+
+
+// Returns current waiting time of a process 
+uint64 
+sys_wtime(void) 
+{ 
+  int pid;
+  argint(0, &pid);
+  return get_wtime(pid) ; 
+}
+
+// Returns currnet uptime of a process
+uint64 
+sys_utime(void) 
+{ 
+  int pid;
+  argint(0, &pid);
+  return get_utime(pid) ; 
+}
+
+// Returns current burst time of a process 
+uint64 
+sys_btime(void) 
+{ 
+  int pid;
+  argint(0, &pid);
+  return get_btime(pid) ; 
+}

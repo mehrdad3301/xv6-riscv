@@ -182,7 +182,7 @@ freeproc(struct proc *p)
   p->ctime = 0; 
   p->rtime = 0; 
   p->wtime = 0; 
-  p->ttime = 0;
+  p->utime = 0;
   p->state = UNUSED;
 }
 
@@ -389,10 +389,6 @@ exit(int status)
   wakeup(p->parent);
   
   acquire(&p->lock);
-
-  acquire(&tickslock) ; 
-  p->ttime = ticks ;
-  release(&tickslock) ; 
 
   p->xstate = status;
   p->state = ZOMBIE;
@@ -622,6 +618,7 @@ update_pticks(void)
     } else if (p->state == RUNNABLE) { 
       p->wtime += 1 ; 
     } 
+    p->utime += 1 ; 
     release(&p->lock) ; 
   }
 }
@@ -797,10 +794,11 @@ procdump(void)
     char name[16] ; strnindent(p->name, name, 17) ; 
     char pid[5]   ; strnindent(stritoa(p->pid  , pid  , 10), pid  , 5);
     char ctime[5] ; strnindent(stritoa(p->ctime, ctime, 10), ctime, 5); 
+    char utime[5] ; strnindent(stritoa(p->utime, utime, 10), utime, 5); 
     char rtime[5] ; strnindent(stritoa(p->rtime, rtime, 10), rtime, 5); 
     char wtime[5] ; strnindent(stritoa(p->wtime, wtime, 10), wtime, 5); 
     
-    printf("%s %s %s %s %s %s", pid, name, state, ctime, rtime, wtime);
+    printf("%s %s %s %s %s %s %s", pid, name, state, ctime, utime, rtime, wtime);
     printf("\n");
   }
 }
@@ -851,4 +849,58 @@ nprocs(void) {
   }
 
   return n ; 
+}
+
+int 
+get_wtime(int pid) 
+{
+
+  int wtime = -1; // indicates an error in case pid isn't found 
+
+  struct proc *p ; 
+  for(p = proc; p < &proc[NPROC]; p++){
+    if (p->pid == pid){
+      acquire(&p->lock); 
+      wtime = p->wtime ; 
+      release(&p->lock); 
+    }
+  }
+
+  return wtime ; 
+}
+
+int 
+get_utime(int pid) 
+{ 
+  int utime = -1;
+
+  struct proc *p ; 
+  for(p = proc; p < &proc[NPROC]; p++){
+    if (p->pid == pid){
+      acquire(&p->lock); 
+      utime = p->utime ; 
+      release(&p->lock); 
+    }
+  }
+
+  return utime ; 
+
+}
+
+int 
+get_btime(int pid) 
+{ 
+
+  int btime = -1;
+
+  struct proc *p ; 
+  for(p = proc; p < &proc[NPROC]; p++){
+    if (p->pid == pid){
+      acquire(&p->lock); 
+      btime = p->rtime ; 
+      release(&p->lock); 
+    }
+  }
+
+  return btime ; 
 }

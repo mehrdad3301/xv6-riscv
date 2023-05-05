@@ -26,6 +26,10 @@ int uptime(void);
 int proctick(int); 
 int sysinfo(struct sysinfo*); 
 void sched(const char *); 
+int wtime(int); 
+int utime(int); 
+int btime(int); 
+
 
 // ulib.c
 int stat(const char*, struct stat*);

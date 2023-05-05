@@ -23,5 +23,9 @@
 #define SYS_proctick 22
 #define SYS_sysinfo 23
 #define SYS_sched   24
+#define SYS_wtime   25
+#define SYS_utime   26
+#define SYS_btime   27
+
 
 
