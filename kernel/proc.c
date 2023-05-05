@@ -824,8 +824,8 @@ proctick(int pid)
       break; 
     }
     release(&p->lock);
-    return -1; 
   }
+  return -1; 
 
 found: 
 

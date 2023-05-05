@@ -16,10 +16,10 @@ main(int argc, char *argv[])
     int ticks ; 
     if ((ticks = proctick(atoi(argv[1]))) < 0) {
         switch (ticks) { 
-            default: 
-                fprintf(2, "error: getproctick\n");
             case INVALID_PID: 
                 fprintf(2, "error: getproctick: invalid pid\n");
+            default: 
+                fprintf(2, "error: getproctick\n");
         }
       exit(1);
     } 
