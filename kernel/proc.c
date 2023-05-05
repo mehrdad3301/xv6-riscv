@@ -128,9 +128,11 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->rtime = 0; 
+  p->wtime = 0; 
   
   acquire(&tickslock);
-  p->ticks0 = ticks;
+  p->ctime = ticks;
   release(&tickslock);
   
 
@@ -177,7 +179,10 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
-  p->ticks0 = 0; 
+  p->ctime = 0; 
+  p->rtime = 0; 
+  p->wtime = 0; 
+  p->ttime = 0;
   p->state = UNUSED;
 }
 
@@ -385,6 +390,10 @@ exit(int status)
   
   acquire(&p->lock);
 
+  acquire(&tickslock) ; 
+  p->ttime = ticks ;
+  release(&tickslock) ; 
+
   p->xstate = status;
   p->state = ZOMBIE;
 
@@ -512,7 +521,7 @@ fcfs_scheduler(struct cpu *c)
       // Avoid scheduling init or sh processes 
       if (p->pid > 2) { 
         if (firstP != 0) { 
-          if (p->ticks0 < firstP->ticks0) { 
+          if (p->ctime < firstP->ctime) { 
             firstP = p ; 
           }
         } else { 
@@ -599,6 +608,22 @@ yield(void)
   p->state = RUNNABLE;
   sched();
   release(&p->lock);
+}
+
+// Updates process ticks, ctime, rtime, ttime, wtime
+void 
+update_pticks(void) 
+{
+  struct proc *p ; 
+  for (p = proc ; p < &proc[NPROC] ; p++) { 
+    acquire(&p->lock) ; 
+    if (p->state == RUNNING) { 
+      p->rtime += 1 ;
+    } else if (p->state == RUNNABLE) { 
+      p->wtime += 1 ; 
+    } 
+    release(&p->lock) ; 
+  }
 }
 
 // A fork child's very first scheduling by scheduler()
@@ -750,12 +775,12 @@ void
 procdump(void)
 {
   static char *states[] = {
-  [UNUSED]    "unused",
-  [USED]      "used",
-  [SLEEPING]  "sleep ",
-  [RUNNABLE]  "runble",
-  [RUNNING]   "run   ",
-  [ZOMBIE]    "zombie"
+  [UNUSED]    "unused ",
+  [USED]      "used   ",
+  [SLEEPING]  "sleep  ",
+  [RUNNABLE]  "runable",
+  [RUNNING]   "run    ",
+  [ZOMBIE]    "zombie "
   };
   struct proc *p;
   char *state;
@@ -768,22 +793,32 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    printf("%d %s %s", p->pid, state, p->name);
+
+    char name[16] ; strnindent(p->name, name, 17) ; 
+    char pid[5]   ; strnindent(stritoa(p->pid  , pid  , 10), pid  , 5);
+    char ctime[5] ; strnindent(stritoa(p->ctime, ctime, 10), ctime, 5); 
+    char rtime[5] ; strnindent(stritoa(p->rtime, rtime, 10), rtime, 5); 
+    char wtime[5] ; strnindent(stritoa(p->wtime, wtime, 10), wtime, 5); 
+    
+    printf("%s %s %s %s %s %s", pid, name, state, ctime, rtime, wtime);
     printf("\n");
   }
 }
 
+
+// Returns number of ticks happened since 
+// process with pid was created
 int 
 proctick(int pid) 
 { 
 
   struct proc *p;
-  uint ticks0, xticks ; 
+  uint ctime, xticks ; 
 
   for(p = proc; p < &proc[NPROC]; p++){
     acquire(&p->lock);
     if(p->pid == pid){
-      ticks0 = p->ticks0; 
+      ctime = p->ctime; 
       release(&p->lock);
       goto found ; 
       break; 
@@ -797,7 +832,7 @@ found:
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
-  return xticks - ticks0;
+  return xticks - ctime;
 }
 
 

@@ -104,6 +104,10 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  // number of cpu time interrupted occured 
-  uint ticks0;               // when this process started.
+  uint ctime;                  // ticks when process was created
+  uint ttime;                  // ticks when process was terminated 
+  // Number of ticks for which this process
+  uint rtime;                  // was in RUNNING state
+  // Number of ticks for which this process
+  uint wtime;                  // was in RUNNABLE state 
 };
