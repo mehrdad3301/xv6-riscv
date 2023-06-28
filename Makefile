@@ -135,6 +135,7 @@ UPROGS=\
 	$U/_proctick\
 	$U/_sysinfo\
 	$U/_pingpong\
+	$U/_cowtest\
 
 
 fs.img: mkfs/mkfs README $(UPROGS)
