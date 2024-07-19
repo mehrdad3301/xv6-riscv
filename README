@@ -1,5 +1,47 @@
 xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
 Version 6 (v6).  xv6 loosely follows the structure and style of v6,
+but is implemented for a modern RISC-V multiprocessor using ANSI C. I forked the repository and added some new functionality to learn more about operating systems. 
+
+### How to Run  
+xv6 runs on RISC-V multiprocessor. I use docker and qemu emulator to run the operating system on my computer. You can follow the instructions provided [here](https://github.com/wtakuo/xv6-env). 
+
+### Added functionality 
+- **sysinfo** systemcall 
+lets you see current information of the operating system. 
+```
+$ sysinfo
+uptime: 24
+total memory: 4096M
+free memory: 131M
+used processes: 3
+```
+
+- **copy-on-write**
+The fork() system call in xv6 copies all of the parent process’s user-space memory into the child. If the parent is large, copying can take a long time. In addition, the copies often waste memory; in many cases neither the parent nor the child modifies a page, so that in principle they could share the same physical memory. 
+The goal of copy-on-write (COW) fork() is to defer allocating and copying physical memory pages for the child until the copies are actually needed, if ever.
+
+- **lazy allocation**
+One of the many neat tricks an O/S can play with page table hardware is lazy allocation of user-space heap memory. Xv6 applications ask the kernel for heap memory using the sbrk() system call. In the original kernel, sbrk() allocates physical memory and maps it into the process's virtual address space. It can take a long time for a kernel to allocate and map memory for a large request. To allow sbrk() to complete more quickly in these cases, sophisticated kernels allocate user memory lazily. That is, sbrk() doesn't allocate physical memory, but just remembers which user addresses are allocated and marks those addresses as invalid in the user page table. When the process first tries to use any given page of lazily-allocated memory, the CPU generates a page fault, which the kernel handles by allocating physical memory, zeroing it, and mapping it.
+
+- **FCFS** 
+original implementation of xv6 uses round-robin scheduling. Clearly, round-robin is a more sophiscated algorithm than FCFS. However, simply as an exercises, I added FCFS scheduling. You can switch between the two using ```sched``` system call. 
+
+```
+$ sched RR 
+$ sched FCFS
+```
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------
+xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
+Version 6 (v6).  xv6 loosely follows the structure and style of v6,
 but is implemented for a modern RISC-V multiprocessor using ANSI C.
 
 ACKNOWLEDGMENTS
